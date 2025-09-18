@@ -1,4 +1,4 @@
-name: Sync with upstream
+name: Safe Sync with Upstream
 
 on:
   schedule:
@@ -6,19 +6,28 @@ on:
   workflow_dispatch: {}  # 允许手动触发
 
 jobs:
-  sync:
+  safe-sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main branch
         uses: actions/checkout@v3
-        # 不使用 PAT，直接用默认 GITHUB_TOKEN
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # 确保拉取完整历史
 
-      - name: Sync with upstream
-        uses: aormsby/fork-sync-with-upstream-action@v2.3
-        with:
-          target_branch: main
-          upstream_repository: yonggekkk/sing-box-yg
-          upstream_branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/yonggekkk/sing-box-yg.git || echo "upstream already exists"
+          git fetch upstream
+
+      - name: Merge upstream/main into main
+        run: |
+          git checkout main
+          git merge --no-commit --no-ff upstream/main || echo "Merge conflicts detected, skipping push"
+          git commit -m "Sync with upstream" || echo "Nothing to commit"
+          git push origin main || echo "Nothing to push"
