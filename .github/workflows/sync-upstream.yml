@@ -3,7 +3,7 @@ name: Sync with upstream
 on:
   schedule:
     - cron: '0 0 * * *'  # 每天UTC时间午夜执行一次
-  workflow_dispatch: {}  # 允许手动手动触发
+  workflow_dispatch: {}  # 允许手动触发
 
 jobs:
   sync:
@@ -11,9 +11,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        # 不使用 PAT，直接用默认 GITHUB_TOKEN
         with:
-          # 如果你没设置 PAT，也可以删掉这行
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync with upstream
         uses: aormsby/fork-sync-with-upstream-action@v2.3
