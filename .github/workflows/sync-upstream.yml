@@ -3,7 +3,7 @@ name: Sync with upstream
 on:
   schedule:
     - cron: '0 0 * * *'  # 每天UTC时间午夜执行一次
-  workflow_dispatch: {}  # 允许手动触发
+  workflow_dispatch: {}  # 允许手动手动触发
 
 jobs:
   sync:
@@ -12,18 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          # 使用Personal Access Token (PAT)以便能够触发其他工作流程
-          # 如果不需要触发其他工作流程，可以使用默认的GITHUB_TOKEN
-          token: ${{ secrets.PAT }} 
+          # 如果你没设置 PAT，也可以删掉这行
+          token: ${{ secrets.PAT }}
 
       - name: Sync with upstream
-        uses: aormsby/fork-sync-with-upstream-action@v2.3 
+        uses: aormsby/fork-sync-with-upstream-action@v2.3
         with:
-          # 你的fork仓库的分支
           target_branch: main
-          # 上游（原始）仓库的地址
-          upstream_repository: <上游仓库的作者名>/<仓库名>
-          # 上游仓库的分支
+          upstream_repository: yonggekkk/sing-box-yg
           upstream_branch: main
-          # 使用默认的GITHUB_TOKEN即可
           github_token: ${{ secrets.GITHUB_TOKEN }}
